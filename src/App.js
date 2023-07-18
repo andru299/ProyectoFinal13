@@ -1,24 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import PrivateRoute from "./components/LoginPage/PrivateRoute";
+import Login from "./components/LoginPage/Login";
+import Character from "./components/Character";
+import Home from "./components/Home";
+import Detalle from "./components/Detalle"; // Importa el componente Detalle
+import "./App.css";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <header className="App-header">
+          <div className="container">
+            <h1 className="title">Nuevas Amistades</h1>
+          </div>
+          <div className="text-container">
+            <h1 className="text">
+              Aquí encontrarás nuevas amistades de manera aleatoria
+            </h1>
+          </div>
+          <Switch>
+            <Route exact path="/login">
+              {isLoggedIn ? <Redirect to="/home" /> : <Login onLogin={handleLogin} />}
+            </Route>
+            <PrivateRoute path="/home" component={Home} isAuthenticated={isLoggedIn} />
+            <PrivateRoute path="/character" component={Character} isAuthenticated={isLoggedIn} />
+            <PrivateRoute path="/detalle/:id" component={Detalle} isAuthenticated={isLoggedIn} /> {/* Ruta protegida con PrivateRoute */}
+            <Redirect to="/login" />
+          </Switch>
+        </header>
+      </div>
+    </Router>
   );
 }
 
